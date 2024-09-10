@@ -1,3 +1,4 @@
+
 name: tailnord
 
 services:
@@ -12,8 +13,8 @@ services:
     restart: always
     volumes:
       - "/dev/net/tun:/dev/net/tun"
-      - "/home/opc/docker-volumes/tailscale/state:/var/lib/tailscale"
-      - "/home/opc/docker-volumes/tailscale/scripts:/scripts"
+      - "~/docker-volumes/${NAME}/tailscale/state:/var/lib/tailscale"
+      - "~/docker-volumes/${NAME}/tailscale/scripts:/scripts"
     environment:
       - TAILSCALE_UP_AUTH_KEY=${TAILSCALE_UP_AUTH_KEY}
     cap_add:
@@ -48,7 +49,7 @@ services:
       - NORDVPN_OPENVPN_PROTOCOL=${NORDVPN_OPENVPN_PROTOCOL}
     volumes:
       - "/dev/net/tun:/dev/net/tun"
-      - "/home/opc/docker-volumes/nordvpn/scripts:/scripts"
+      - "~/docker-volumes/${NAME}/nordvpn/scripts:/scripts"
     cap_add:
       - net_admin
       - sys_module

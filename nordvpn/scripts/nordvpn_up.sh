@@ -8,8 +8,6 @@ export PATH=/scripts:$PATH
 RECONNECT_AFTER_HOURS=1
 RECONNECT_AFTER_SECONDS=$(($RECONNECT_AFTER_HOURS * 60 * 60))
 
-ENDPOINT=${NORDVPN_ENDPOINT:-San_Francisco}
-
 if [ -z "$NORDVPN_TOKEN" ]; then
   echo "NORDVPN_TOKEN environment variable is unset."
   exit
@@ -39,7 +37,7 @@ wait_for_nordvpn_daemon() {
 nordvpn_connect() {
   try=3
   while [ 1 ]; do
-    nordvpn connect $ENDPOINT
+    nordvpn connect --group ${NORDVPN_GROUP} ${NORDVPN_COUNTRY}
     if [ $? -eq 0 ]; then
       bash /scripts/iptables_rules.sh add
       return 0
@@ -65,6 +63,7 @@ wait_for_nordvpn_daemon
 
 # Turn off analytics
 nordvpn set analytics off
+nordvpn set notify off
 
 nordvpn status
 
@@ -73,17 +72,14 @@ if [ $? -eq 1 ]; then
   nordvpn login --token $NORDVPN_TOKEN
 fi
 
-# Use OpenVPN over TCP
-nordvpn set technology ${NORDVPN_TECHNOLOGY:=openvpn}
-if [ "$NORDVPN_TECHNOLOGY" = "openvpn" ]; then
-  nordvpn set protocol ${NORDVPN_OPENVPN_PROTOCOL:=tcp}
-fi
+nordvpn set protocol ${NORDVPN_OPENVPN_PROTOCOL:=tcp}
+nordvpn set technology ${NORDVPN_TECHNOLOGY:=NordLynx}
 
 # Our local subnet
 nordvpn allowlist add subnet 10.1.1.0/24
 
 # Enable the connection to persist through reboots
-nordvpn set autoconnect on
+nordvpn set autoconnect p2p
 
 # Enable the kill switch
 nordvpn set killswitch on
